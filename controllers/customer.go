@@ -34,3 +34,13 @@ func (t *TransactionController)CreateTransaction(ctx *gin.Context){
     ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": newtrans})
 
 }
+
+func (t *TransactionController)GetTransaction(ctx *gin.Context){
+    val, err := t.TransactionService.GetCustomer()
+    if(err!=nil){
+        ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+
+    }
+    ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": val})
+
+}

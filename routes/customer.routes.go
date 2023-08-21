@@ -8,5 +8,6 @@ import (
 
 func CustRoute(router *gin.Engine, controller controllers.TransactionController) {
 	router.POST("/api/profile/create", controller.CreateTransaction)
+	router.GET("/api/profile/get", controller.GetTransaction)
 
 }

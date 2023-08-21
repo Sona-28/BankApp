@@ -8,4 +8,5 @@ import (
 
 type Icustomer interface {
 	CreateCustomer (*models.Customer)(*mongo.InsertOneResult,error)
+	GetCustomer() ([]*models.Customer, error) 
 }

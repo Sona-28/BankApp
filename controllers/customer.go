@@ -86,8 +86,9 @@ func (t *TransactionController)DeleteCustomerById(ctx *gin.Context){
 }
 
 func (t *TransactionController)CreateManyCustomer(ctx *gin.Context){
-    var customers []interface{}
-    customers = append(customers, &models.Customer{})
+    var customers []*models.Customer
+    var post *models.Customer
+    customers = append(customers, post)
     if err := ctx.ShouldBindJSON(&customers); err != nil {
         fmt.Println("error on controller")
         ctx.JSON(http.StatusBadRequest, err.Error())

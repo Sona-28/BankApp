@@ -78,7 +78,14 @@ func (c *Cust) DeleteCustomerById(id primitive.ObjectID) (*mongo.DeleteResult, e
 	return res,nil
 }
 
-func (c *Cust) CreateManyCustomer(users []interface{})(*mongo.InsertManyResult,error){
+func (c *Cust) CreateManyCustomer(post []*models.Customer)(*mongo.InsertManyResult,error){
+	var users []interface{}
+	for _,user := range post{
+		user.Customer_ID = primitive.NewObjectID()
+		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password),8)
+		user.Password = string(hashedPassword)
+		users = append(users, user)
+	}
 	res,err := c.mongoCollection.InsertMany(c.ctx, users)
 	// fmt.Println(user)
 	if err!=nil{

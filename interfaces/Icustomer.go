@@ -9,7 +9,7 @@ import (
 
 type Icustomer interface {
 	CreateCustomer(*models.Customer)(*mongo.InsertOneResult,error)
-	CreateManyCustomer([]interface{})(*mongo.InsertManyResult,error)
+	CreateManyCustomer([]*models.Customer)(*mongo.InsertManyResult,error)
 	GetCustomerById(primitive.ObjectID) (*models.Customer, error)
 	UpdateCustomerById(primitive.ObjectID, *models.Customer) (*mongo.UpdateResult, error)
 	DeleteCustomerById(primitive.ObjectID) (*mongo.DeleteResult, error)

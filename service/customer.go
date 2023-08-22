@@ -4,6 +4,7 @@ import (
 	"bankDemo/interfaces"
 	"bankDemo/models"
 	"context"
+	"fmt"
 	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -31,7 +32,7 @@ func(c *Cust) CreateCustomer(user *models.Customer)(*mongo.InsertOneResult,error
 		log.Fatal(err)
 	}
 	user.Customer_ID = primitive.NewObjectID()
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password),8)
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password),7)
 	user.Password = string(hashedPassword)
 	res,err := c.mongoCollection.InsertOne(c.ctx, &user)
 	if err!=nil{
@@ -40,37 +41,49 @@ func(c *Cust) CreateCustomer(user *models.Customer)(*mongo.InsertOneResult,error
 		}
 		return nil,err
 	}
-	// pwd:="78787878"
-	// if err1:=bcrypt.CompareHashAndPassword([]byte(pwd),[]byte(user.Password));err1!=nil{
-	// 	fmt.Println(err1)
-	// }else{
-	// 	fmt.Println("yes")
-	// }
+	
 	return res,nil
 }
 
-func(c *Cust) GetCustomer() ([]*models.Customer, error) {
-	filter := bson.D{}
-	result, err :=  c.mongoCollection.Find(c.ctx,filter)
+
+func(c *Cust) GetCustomerById(id primitive.ObjectID) (*models.Customer, error) {
+	filter := bson.D{{Key: "customer_id", Value: id}}
+	var customer *models.Customer
+	res := c.mongoCollection.FindOne(c.ctx, filter)
+	err := res.Decode(&customer)
 	if err!=nil{
-		// fmt.Println(err.Error())
 		return nil,err
-	}else{
-		var customers []*models.Customer
-		for result.Next(c.ctx){
-			post := &models.Customer{}
-			err := result.Decode(post)
-			if err!=nil{
-				return nil,err
-			}
-			customers = append(customers, post)
-		}
-		if err:=result.Err(); err!=nil{
-			return nil, err
-		}
-		if len(customers) == 0{
-			return []*models.Customer{},nil
-		}
-		return customers,nil
 	}
+	return customer,nil
+}
+
+func(c *Cust) UpdateCustomerById(id primitive.ObjectID, customer *models.Customer) (*mongo.UpdateResult, error){
+	iv := bson.M{"customer_id": id}
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(customer.Password),8)
+	customer.Password = string(hashedPassword)
+	fv := bson.M{"$set": &customer}
+	res,err := c.mongoCollection.UpdateOne(c.ctx, iv, fv)
+	if err!=nil{
+		return nil,err
+	}
+	return res,nil
+}
+
+func (c *Cust) DeleteCustomerById(id primitive.ObjectID) (*mongo.DeleteResult, error){
+	del := bson.M{"customer_id": id}
+	res,err := c.mongoCollection.DeleteOne(c.ctx, del)
+	if err!=nil{
+		return nil,err
+	}
+	return res,nil
+}
+
+func (c *Cust) CreateManyCustomer(users []interface{})(*mongo.InsertManyResult,error){
+	res,err := c.mongoCollection.InsertMany(c.ctx, users)
+	// fmt.Println(user)
+	if err!=nil{
+		fmt.Println("error in service")
+		return nil,err
+	}
+	return res,nil
 }

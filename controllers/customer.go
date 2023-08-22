@@ -5,18 +5,15 @@ import (
 	"bankDemo/models"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type TransactionController struct{
      TransactionService  interfaces.Icustomer
 }
 
-// func InitialiseTransactionController( transaction interfaces.Itransaction)(TransactionController){
-//  return TransactionController{transactionService} 
-// }
 
 func InitTransController(transactionService interfaces.Icustomer) TransactionController {
     return TransactionController{transactionService}
@@ -41,10 +38,9 @@ func (t *TransactionController)CreateTransaction(ctx *gin.Context){
 
 func (t *TransactionController)GetCustomerById(ctx *gin.Context){
     id:= ctx.Param("id")
-    id1,err := primitive.ObjectIDFromHex(id)
+    id1,err := strconv.ParseInt(id,10,64)
     if(err!=nil){
         ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
-
     }
     val, err := t.TransactionService.GetCustomerById(id1)
     if(err!=nil){
@@ -61,7 +57,7 @@ func (t *TransactionController)UpdateCustomerById(ctx *gin.Context){
         ctx.JSON(http.StatusBadRequest, err.Error())
         return
     }
-    id1,err := primitive.ObjectIDFromHex(id)
+    id1,err := strconv.ParseInt(id,10,64)
     if(err!=nil){
         ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
     }
@@ -74,7 +70,7 @@ func (t *TransactionController)UpdateCustomerById(ctx *gin.Context){
 
 func (t *TransactionController)DeleteCustomerById(ctx *gin.Context){
     id:= ctx.Param("id")
-    id1,err := primitive.ObjectIDFromHex(id)
+    id1,err := strconv.ParseInt(id,10,64)
     if(err!=nil){
         ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
     }

@@ -6,6 +6,7 @@ import (
 	"context"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -65,4 +66,26 @@ func (b *Bank1) DeleteBankById(id int64) (*mongo.DeleteResult, error) {
 		return nil, err
 	}
 	return result, nil
+}
+
+func (b *Bank1) GetAllCustomerBank()([]primitive.M,error){
+	pipeline := []bson.M{
+		{
+			"$lookup" : bson.M{
+			"from":"customer",
+			"localField":"bank_id",
+			"foreignField":"bank_id",
+			"as":"customers",
+		},
+	},
+}
+	res,err := b.coll.Aggregate(b.ctx,pipeline)
+	if err!=nil{
+		return nil,err
+	}
+	var results []bson.M
+	if 	err := res.All(b.ctx, &results); err != nil {
+		
+	}
+	return results,nil
 }

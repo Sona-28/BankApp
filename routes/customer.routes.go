@@ -11,6 +11,4 @@ func CustRoute(router *gin.Engine, controller controllers.TransactionController)
 	router.GET("/customer/:id", controller.GetCustomerById)
 	router.PUT("/customer/:id", controller.UpdateCustomerById)
 	router.DELETE("/customer/:id", controller.DeleteCustomerById)
-	
-
 }

@@ -11,5 +11,7 @@ type Customer struct {
 }
 
 type CustTransaction struct {
+	Transaction_id      int64              `json:"transaction_id" bson:"transaction_id"`
 	Transaction_amount int64              `json:"transaction_amount" bson:"transaction_amount"`
+	Transaction_type   string             `json:"transaction_type" bson:"transaction_type"`
 }

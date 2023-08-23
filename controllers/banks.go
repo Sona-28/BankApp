@@ -72,3 +72,10 @@ func (b *BankController) DeleteBankById(ctx *gin.Context){
 	}
 	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": val})
 }
+func (b *BankController) GetAllCustomerBank(ctx *gin.Context){
+    res,err := b.BankService.GetAllCustomerBank()
+    if err!=nil{
+        ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+    }
+    ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": res})
+}

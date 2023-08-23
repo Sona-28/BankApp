@@ -78,4 +78,3 @@ func (c *Cust) DeleteCustomerById(id int64) (*mongo.DeleteResult, error){
 	return res,nil
 }
 
-

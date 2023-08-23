@@ -79,3 +79,4 @@ func (t *TransactionController)DeleteCustomerById(ctx *gin.Context){
     }
     ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": res})
 }
+

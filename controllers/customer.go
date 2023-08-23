@@ -3,7 +3,6 @@ package controllers
 import (
 	"bankDemo/interfaces"
 	"bankDemo/models"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -19,7 +18,7 @@ func InitTransController(transactionService interfaces.Icustomer) TransactionCon
     return TransactionController{transactionService}
 }
 
-func (t *TransactionController)CreateTransaction(ctx *gin.Context){
+func (t *TransactionController)CreateCustomer(ctx *gin.Context){
     var trans *models.Customer  
     if err := ctx.ShouldBindJSON(&trans); err != nil {
         ctx.JSON(http.StatusBadRequest, err.Error())
@@ -76,24 +75,6 @@ func (t *TransactionController)DeleteCustomerById(ctx *gin.Context){
     }
     res,err := t.TransactionService.DeleteCustomerById(id1)
     if err!=nil{
-        ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
-    }
-    ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": res})
-}
-
-func (t *TransactionController)CreateManyCustomer(ctx *gin.Context){
-    var customers []*models.Customer
-    var post *models.Customer
-    customers = append(customers, post)
-    if err := ctx.ShouldBindJSON(&customers); err != nil {
-        fmt.Println("error on controller")
-        ctx.JSON(http.StatusBadRequest, err.Error())
-        return
-    }
-    res,err := t.TransactionService.CreateManyCustomer(customers)
-    if err!=nil{
-        fmt.Println("error on controller1")
-
         ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
     }
     ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": res})

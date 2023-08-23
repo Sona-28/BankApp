@@ -4,7 +4,6 @@ import (
 	"bankDemo/interfaces"
 	"bankDemo/models"
 	"context"
-	"fmt"
 	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -22,11 +21,13 @@ func InitCustomer(collection *mongo.Collection, ctx context.Context) interfaces.
 	return &Cust{ctx,collection}
 }
 func(c *Cust) CreateCustomer(user *models.Customer)(*mongo.InsertOneResult,error){
-	indexModel := mongo.IndexModel{
-		Keys:    bson.M{"account_id": 1,"customer_id":1}, // 1 for ascending, -1 for descending
-		Options: options.Index().SetUnique(true),
+	indexModel := []mongo.IndexModel{
+		{
+			Keys:    bson.D{{Key: "account_id", Value: 1},{Key: "customer_id", Value: 1}}, // 1 for ascending, -1 for descending
+			Options: options.Index().SetUnique(true),
+		},
 	}
-	_, err := c.mongoCollection.Indexes().CreateOne(c.ctx, indexModel)
+	_, err := c.mongoCollection.Indexes().CreateMany(c.ctx, indexModel)
 	if err != nil {
 		return nil,err
 	}
@@ -77,27 +78,4 @@ func (c *Cust) DeleteCustomerById(id int64) (*mongo.DeleteResult, error){
 	return res,nil
 }
 
-func (c *Cust) CreateManyCustomer(post []*models.Customer)(*mongo.InsertManyResult,error){
-	var users []interface{}
-	indexModel := mongo.IndexModel{
-		Keys:    bson.M{"account_id": 1,"customer_id":1}, // 1 for ascending, -1 for descending
-		Options: options.Index().SetUnique(true),
-	}
-	_, err := c.mongoCollection.Indexes().CreateOne(c.ctx, indexModel)
-	if err != nil {
-		return nil,err
-	}
-	for _,user := range post{
-		// user.Customer_ID = primitive.NewObjectID()
-		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password),8)
-		user.Password = string(hashedPassword)
-		users = append(users, user)
-	}
-	res,err := c.mongoCollection.InsertMany(c.ctx, users)
-	// fmt.Println(user)
-	if err!=nil{
-		fmt.Println("error in service")
-		return nil,err
-	}
-	return res,nil
-}
+

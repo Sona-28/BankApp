@@ -28,12 +28,34 @@ func initRoutes(){
 
 func initApp(mongoClient *mongo.Client){
 	ctx = context.TODO()
-	profileCollection := mongoClient.Database("banking").Collection("customer")
+	profileCollection := mongoClient.Database(constants.Dbname).Collection("customer")
 	profileService := service.InitCustomer(profileCollection, ctx)
 	profileController := controllers.InitTransController(profileService)
 	routes.CustRoute(server,profileController)
 }
 
+func initAcc(mongoClient *mongo.Client){
+	ctx = context.TODO()
+	accCollection := mongoClient.Database(constants.Dbname).Collection("account")
+	accService := service.InitAccount(accCollection, ctx)
+	accController := controllers.InitAccController(accService)
+	routes.AccRoute(server,accController)
+}
+
+func initBank(mongoClient *mongo.Client){
+	ctx = context.TODO()
+	bCollection := mongoClient.Database(constants.Dbname).Collection("bank")
+	bService := service.InitBank(bCollection, ctx)
+	bController := controllers.InitBankController(bService)
+	routes.BankRoute(server,bController)
+}
+func initLoan(mongoClient *mongo.Client){
+	ctx = context.TODO()
+	lCollection := mongoClient.Database(constants.Dbname).Collection("loan")
+	lService := service.InitLoan(lCollection, ctx)
+	lController := controllers.InitLoanController(lService)
+	routes.LoanRoute(server,lController)
+}
 
 func main(){
 	server = gin.Default()
@@ -44,6 +66,9 @@ func main(){
 	}
 	initRoutes()
 	initApp(mongoclient)
+	initAcc(mongoclient)
+	initBank(mongoclient)
+	initLoan(mongoclient)
 	fmt.Println("server running on port",constants.Port)
 	log.Fatal(server.Run(constants.Port))
 }

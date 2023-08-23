@@ -7,9 +7,9 @@ type Customer struct {
 	Password    string             `json:"password" bson:"password"`
 	Name        string             `json:"name" bson:"name"`
 	Account_ID  int64              `json:"account_id" bson:"account_id"`
+	Transaction []CustTransaction `json:"transaction" bson:"transaction"`
 }
 
 type CustTransaction struct {
-	Customer_ID        int64 `json:"customer_id" bson:"customer_id"`
 	Transaction_amount int64              `json:"transaction_amount" bson:"transaction_amount"`
 }

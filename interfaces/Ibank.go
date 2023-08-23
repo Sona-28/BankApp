@@ -13,5 +13,6 @@ type IBank interface{
 	UpdateBankById(id int64, bank *models.Bank) (*mongo.UpdateResult, error)
 	DeleteBankById(id int64) (*mongo.DeleteResult, error)
 	GetAllCustomerBank() ([]primitive.M, error)
-
+	GetAllBankTransaction(int64) ([]interface{}, error)
+	GetAllBankTransDate(string, string) ([]interface{}, error)
 }

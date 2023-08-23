@@ -13,6 +13,11 @@ type BankController struct {
 	BankService interfaces.IBank
 }
 
+type Date struct{
+	From string `json:"from"`
+	To string `json:"to"`
+}
+
 func InitBankController(bankService interfaces.IBank) BankController {
 	return BankController{bankService}
 }
@@ -79,3 +84,29 @@ func (b *BankController) GetAllCustomerBank(ctx *gin.Context){
     }
     ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": res})
 }
+
+func (b *BankController) GetAllBankTransaction(ctx *gin.Context){
+	id := ctx.Param("id")
+	id1, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+	}
+	res,err := b.BankService.GetAllBankTransaction(id1)
+	if err!=nil{
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+	}
+	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": res})
+}
+
+func (b *BankController) GetAllBankTransDate(ctx *gin.Context){
+	var date *Date
+	if err := ctx.ShouldBindJSON(&date); err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+	}
+	res,err := b.BankService.GetAllBankTransDate(date.From,date.To)
+	if err!=nil{
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+	}
+	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": res})
+}
+

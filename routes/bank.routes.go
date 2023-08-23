@@ -12,5 +12,6 @@ func BankRoute(r *gin.Engine, bankController controllers.BankController) {
 	r.PUT("/bank/:id", bankController.UpdateBankById)
 	r.DELETE("/bank/:id", bankController.DeleteBankById)
 	r.GET("/customerbank", bankController.GetAllCustomerBank)
-
+	r.GET("/banktransaction/:id", bankController.GetAllBankTransaction)
+	r.POST("/banktransaction", bankController.GetAllBankTransDate)
 }

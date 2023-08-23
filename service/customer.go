@@ -5,6 +5,8 @@ import (
 	"bankDemo/models"
 	"context"
 	"log"
+	"reflect"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -16,6 +18,7 @@ type Cust struct{
 	ctx context.Context
 	mongoCollection *mongo.Collection
 }
+
 
 func InitCustomer(collection *mongo.Collection, ctx context.Context) interfaces.Icustomer{
 	return &Cust{ctx,collection}
@@ -31,7 +34,7 @@ func(c *Cust) CreateCustomer(user *models.Customer)(*mongo.InsertOneResult,error
 	if err != nil {
 		return nil,err
 	}
-	// user.Customer_ID = primitive.NewObjectID()
+	user.Transaction[0].Date = time.Now()
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password),7)
 	user.Password = string(hashedPassword)
 	res,err := c.mongoCollection.InsertOne(c.ctx, &user)
@@ -57,11 +60,16 @@ func(c *Cust) GetCustomerById(id int64) (*models.Customer, error) {
 	return customer,nil
 }
 
-func(c *Cust) UpdateCustomerById(id int64, customer *models.Customer) (*mongo.UpdateResult, error){
+func(c *Cust) UpdateCustomerById(id int64, n *models.UpdateModel) (*mongo.UpdateResult, error){
 	iv := bson.M{"customer_id": id}
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(customer.Password),8)
-	customer.Password = string(hashedPassword)
-	fv := bson.M{"$set": &customer}
+	if n.Topic == "password"{
+		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(string(n.FinalValue.(string))),8)
+		n.FinalValue = string(hashedPassword)
+	}
+	if reflect.TypeOf(n.FinalValue).String() == "float64"{
+		n.FinalValue = int64(n.FinalValue.(float64))
+	}
+	fv := bson.M{"$set": bson.M{n.Topic: n.FinalValue}}
 	res,err := c.mongoCollection.UpdateOne(c.ctx, iv, fv)
 	if err!=nil{
 		return nil,err
@@ -78,3 +86,13 @@ func (c *Cust) DeleteCustomerById(id int64) (*mongo.DeleteResult, error){
 	return res,nil
 }
 
+func (c *Cust)GetAllCustomerTransaction(id int64)(*[]models.CustTransaction,error){
+	filter := bson.D{{Key: "customer_id", Value: id}}
+	var customer *models.Customer
+	res := c.mongoCollection.FindOne(c.ctx, filter)
+	err := res.Decode(&customer)
+	if err!=nil{
+		return nil,err
+	}
+	return &customer.Transaction,nil
+}

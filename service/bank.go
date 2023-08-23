@@ -4,6 +4,7 @@ import (
 	"bankDemo/interfaces"
 	"bankDemo/models"
 	"context"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -15,7 +16,6 @@ type Bank1 struct {
 	ctx  context.Context
 	coll *mongo.Collection
 }
-
 
 func InitBank(collection *mongo.Collection, ctx context.Context) interfaces.IBank {
 	return &Bank1{ctx, collection}
@@ -68,24 +68,84 @@ func (b *Bank1) DeleteBankById(id int64) (*mongo.DeleteResult, error) {
 	return result, nil
 }
 
-func (b *Bank1) GetAllCustomerBank()([]primitive.M,error){
+func (b *Bank1) GetAllCustomerBank() ([]primitive.M, error) {
 	pipeline := []bson.M{
 		{
-			"$lookup" : bson.M{
-			"from":"customer",
-			"localField":"bank_id",
-			"foreignField":"bank_id",
-			"as":"customers",
+			"$lookup": bson.M{
+				"from":         "customer",
+				"localField":   "bank_id",
+				"foreignField": "bank_id",
+				"as":           "customers",
+			},
 		},
-	},
-}
-	res,err := b.coll.Aggregate(b.ctx,pipeline)
-	if err!=nil{
-		return nil,err
+	}
+	res, err := b.coll.Aggregate(b.ctx, pipeline)
+	if err != nil {
+		return nil, err
 	}
 	var results []bson.M
-	if 	err := res.All(b.ctx, &results); err != nil {
-		
+	if err := res.All(b.ctx, &results); err != nil {
+		return nil, err
 	}
-	return results,nil
+	fmt.Println(results)
+	return results, nil
+}
+
+func (b *Bank1) GetAllBankTransaction(id int64) ([]interface{}, error) {
+	pipeline := []bson.M{
+		{
+			"$match": bson.M{"bank_id": id},
+		},
+		{"$lookup": bson.M{
+			"from":         "customer",
+			"localField":   "bank_id",
+			"foreignField": "bank_id",
+			"as":           "transactionsBank",
+		},
+		},
+	}
+	var bank []bson.M
+	res,err := b.coll.Aggregate(b.ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
+	if err := res.All(b.ctx, &bank); err != nil {
+		return nil, err
+	}
+	var p []interface{}
+	for _,v := range bank{
+		for _,v1 := range v["transactionsBank"].(primitive.A){
+			p = append(p,v1.(primitive.M)["transaction"])
+		}
+	}
+	return p, nil
+}
+
+func (b *Bank1) GetAllBankTransDate(date1 string, date2 string)([]interface{}, error){
+	pipeline := []bson.M{
+		{"$lookup": bson.M{
+			"from":         "customer",
+			"localField":   "bank_id",
+			"foreignField": "bank_id",
+			"as":           "transactionsBank",
+		},
+		},
+	}
+	var bank []bson.M
+	res,err := b.coll.Aggregate(b.ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
+	if err := res.All(b.ctx, &bank); err != nil {
+		return nil, err
+	}
+	var p []interface{}
+	for _,v := range bank{
+		for _,v1 := range v["transactionsBank"].(primitive.A){
+			if v1.(primitive.M)["transaction"].(primitive.M)["date"].(string) >= date1 && v1.(primitive.M)["transaction"].(primitive.M)["date"].(string) <= date2{
+				p = append(p,v1.(primitive.M)["transaction"])
+			}
+		}
+	}
+	return p, nil
 }

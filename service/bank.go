@@ -105,7 +105,7 @@ func (b *Bank1) GetAllBankTransaction(id int64) ([]interface{}, error) {
 		},
 	}
 	var bank []bson.M
-	res,err := b.coll.Aggregate(b.ctx, pipeline)
+	res, err := b.coll.Aggregate(b.ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
@@ -113,15 +113,15 @@ func (b *Bank1) GetAllBankTransaction(id int64) ([]interface{}, error) {
 		return nil, err
 	}
 	var p []interface{}
-	for _,v := range bank{
-		for _,v1 := range v["transactionsBank"].(primitive.A){
-			p = append(p,v1.(primitive.M)["transaction"])
+	for _, v := range bank {
+		for _, v1 := range v["transactionsBank"].(primitive.A) {
+			p = append(p, v1.(primitive.M)["transaction"])
 		}
 	}
 	return p, nil
 }
 
-func (b *Bank1) GetAllBankTransDate(date1 string, date2 string)([]interface{}, error){
+func (b *Bank1) GetAllBankTransDate(date1 string, date2 string) ([]interface{}, error) {
 	pipeline := []bson.M{
 		{"$lookup": bson.M{
 			"from":         "customer",
@@ -132,20 +132,31 @@ func (b *Bank1) GetAllBankTransDate(date1 string, date2 string)([]interface{}, e
 		},
 	}
 	var bank []bson.M
-	res,err := b.coll.Aggregate(b.ctx, pipeline)
+	res, err := b.coll.Aggregate(b.ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	if err := res.All(b.ctx, &bank); err != nil {
 		return nil, err
 	}
+	var x []interface{}
 	var p []interface{}
-	for _,v := range bank{
-		for _,v1 := range v["transactionsBank"].(primitive.A){
-			if v1.(primitive.M)["transaction"].(primitive.M)["date"].(string) >= date1 && v1.(primitive.M)["transaction"].(primitive.M)["date"].(string) <= date2{
-				p = append(p,v1.(primitive.M)["transaction"])
-			}
+	for _, v := range bank {
+		fmt.Println(v)
+		for _, v1 := range v["transactionsBank"].(primitive.A) {
+			p = append(p, v1.(primitive.M)["transaction"])
 		}
 	}
-	return p, nil
+	for _, t := range p {
+			t1 := t.(primitive.A)
+			for i := 0; i < len(t1); i++ {
+				date := t1[i].(primitive.M)["date"].(string)
+				if date >= date1 && date <= date2 {
+					x = append(x, t1[i])
+				}
+			}
+		}
+	return x, nil
 }
+
+

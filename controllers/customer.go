@@ -99,7 +99,11 @@ func (t *TransactionController)GetAllCustomerTransaction(ctx *gin.Context){
 func (t *TransactionController)GetAllTransactionSum(ctx *gin.Context){
     id := ctx.Param("id")
     id1,_ := strconv.ParseInt(id,10,64)
-    res,err := t.TransactionService.GetAllTransactionSum(id1)
+    var date *Date
+	if err := ctx.ShouldBindJSON(&date); err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+	}
+    res,err := t.TransactionService.GetAllTransactionSum(id1, date.From, date.To)
     if err!=nil{
         ctx.JSON(http.StatusBadGateway, gin.H{"status":"fail","message":err.Error()})
     }

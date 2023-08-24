@@ -106,17 +106,40 @@ func (c *Cust)GetAllCustomerTransaction(id int64)(*[]models.CustTransaction,erro
 	return &customer.Transaction,nil
 }
 
-func (c *Cust)GetAllTransactionSum(id int64)(int64, error){
-	filter := bson.D{{Key: "customer_id", Value: id}}
-	var customer *models.Customer
-	res := c.mongoCollection.FindOne(c.ctx, filter)
-	err := res.Decode(&customer)
+func (c *Cust)GetAllTransactionSum(id int64, date1 string, date2 string)(int64, error){
+	layout := "2006-01-02 15:04:05.999999 -0700 MST"
+
+	start,_ := time.Parse(layout, date1)
+	end,_ := time.Parse(layout, date2)
+
+	pipeline := []bson.M{
+		{	"$match": {
+					{"$and" :[{"customer_id": id}]},
+					{"$and":{
+					"transaction.date": bson.M{
+						"$gte": start,
+						"$lte": end,
+					}},
+				},
+			},
+	}},
+		{
+			"$unwind": "$transaction",
+		},
+		{
+			"$group": bson.M{
+				"_id": "",
+				"total": bson.M{"$sum": "$transaction.transaction_amount",},
+			},
+		},
+	}
+	res1, err:= c.mongoCollection.Aggregate(c.ctx, pipeline)
 	if err!=nil{
-		return 0,err
+		return 0, err
 	}
-	var sum int64 =0
-	for i:=0;i<len(customer.Transaction);i++{
-		sum += customer.Transaction[i].Transaction_amount
+	var re []bson.M
+	if err := res1.All(c.ctx, &re); err != nil {
+		return 0, err
 	}
-	return sum,nil
+	return re[0]["total"].(int64),nil
 }

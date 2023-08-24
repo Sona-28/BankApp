@@ -14,5 +14,5 @@ type IBank interface{
 	DeleteBankById(id int64) (*mongo.DeleteResult, error)
 	GetAllCustomerBank() ([]primitive.M, error)
 	GetAllBankTransaction(int64) ([]interface{}, error)
-	GetAllBankTransDate(string, string) ([]interface{}, error)
+	GetAllBankTransDate(int64, string, string) ([]interface{}, error)
 }

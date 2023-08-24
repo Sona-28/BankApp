@@ -99,11 +99,13 @@ func (b *BankController) GetAllBankTransaction(ctx *gin.Context){
 }
 
 func (b *BankController) GetAllBankTransDate(ctx *gin.Context){
+	id := ctx.Param("id")
+	id1,_ := strconv.ParseInt(id,10,64) 
 	var date *Date
 	if err := ctx.ShouldBindJSON(&date); err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 	}
-	res,err := b.BankService.GetAllBankTransDate(date.From,date.To)
+	res,err := b.BankService.GetAllBankTransDate(id1, date.From,date.To)
 	if err!=nil{
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 	}

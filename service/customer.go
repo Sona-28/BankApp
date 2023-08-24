@@ -34,9 +34,10 @@ func(c *Cust) CreateCustomer(user *models.Customer)(*mongo.InsertOneResult,error
 	if err != nil {
 		return nil,err
 	}
-	date := time.Now()
+	// date := time.Now()
+	//.Format("2006-01-02 15:04:05")
 	for i:=0;i<len(user.Transaction);i++{
-		user.Transaction[i].Date = date.Format("2006-01-02 12.50.00.000000000")
+		user.Transaction[i].Date = time.Now()
 	}
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password),7)
 	user.Password = string(hashedPassword)

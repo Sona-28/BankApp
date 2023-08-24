@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type Customer struct {
 	Customer_ID int64             `json:"customer_id" bson:"customer_id"`
 	Bank_ID     int64             `json:"bank_id" bson:"bank_id"`
@@ -12,6 +14,6 @@ type Customer struct {
 type CustTransaction struct {
 	Transaction_id     int64     `json:"transaction_id" bson:"transaction_id"`
 	Transaction_amount int64     `json:"transaction_amount" bson:"transaction_amount"`
-	Date               string `json:"date" bson:"date"`
+	Date               time.Time `json:"date" bson:"date"`
 	Transaction_type   string    `json:"transaction_type" bson:"transaction_type"`
 }

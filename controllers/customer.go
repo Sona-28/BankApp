@@ -95,3 +95,13 @@ func (t *TransactionController)GetAllCustomerTransaction(ctx *gin.Context){
     }
     ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": res})
 }
+
+func (t *TransactionController)GetAllTransactionSum(ctx *gin.Context){
+    id := ctx.Param("id")
+    id1,_ := strconv.ParseInt(id,10,64)
+    res,err := t.TransactionService.GetAllTransactionSum(id1)
+    if err!=nil{
+        ctx.JSON(http.StatusBadGateway, gin.H{"status":"fail","message":err.Error()})
+    }
+    ctx.JSON(http.StatusAccepted, gin.H{"status":"success", "sum":res})
+}

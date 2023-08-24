@@ -12,4 +12,5 @@ func CustRoute(router *gin.Engine, controller controllers.TransactionController)
 	router.PUT("/customer/:id", controller.UpdateCustomerById)
 	router.DELETE("/customer/:id", controller.DeleteCustomerById)
 	router.GET("/customertrans/:id", controller.GetAllCustomerTransaction)
+	router.GET("/transsum/:id", controller.GetAllTransactionSum)
 }

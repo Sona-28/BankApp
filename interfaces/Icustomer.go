@@ -11,5 +11,5 @@ type Icustomer interface {
 	UpdateCustomerById(int64, *models.UpdateModel) (*mongo.UpdateResult, error)
 	DeleteCustomerById(int64) (*mongo.DeleteResult, error)
 	GetAllCustomerTransaction(int64) (*[]models.CustTransaction, error)
-
+	GetAllTransactionSum(int64) (int64, error)
 }

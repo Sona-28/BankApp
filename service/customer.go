@@ -113,18 +113,17 @@ func (c *Cust)GetAllTransactionSum(id int64, date1 string, date2 string)(int64, 
 	end,_ := time.Parse(layout, date2)
 
 	pipeline := []bson.M{
-		{	"$match": {
-					{"$and" :[{"customer_id": id}]},
-					{"$and":{
-					"transaction.date": bson.M{
-						"$gte": start,
-						"$lte": end,
-					}},
-				},
-			},
-	}},
 		{
 			"$unwind": "$transaction",
+		},
+		{
+			"$match": bson.M{
+				"customer_id": id,
+				"transaction.date": bson.M{
+					"$gte": start,
+					"$lte": end,
+				},
+			},
 		},
 		{
 			"$group": bson.M{
@@ -141,5 +140,9 @@ func (c *Cust)GetAllTransactionSum(id int64, date1 string, date2 string)(int64, 
 	if err := res1.All(c.ctx, &re); err != nil {
 		return 0, err
 	}
-	return re[0]["total"].(int64),nil
+	var sum int64 = 0
+	for i:=0; i<len(re);i++{
+		sum += re[i]["total"].(int64)
+	}
+	return sum,nil
 }

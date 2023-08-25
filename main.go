@@ -18,7 +18,6 @@ import (
 
 
 var (
-	mongoclient *mongo.Client
 	ctx         context.Context
 	server         *gin.Engine
 )
@@ -30,7 +29,7 @@ func initApp(mongoClient *mongo.Client){
 	ctx = context.TODO()
 	profileCollection := mongoClient.Database(constants.Dbname).Collection("customer")
 	profileService := service.InitCustomer(profileCollection, ctx)
-	profileController := controllers.InitTransController(profileService)
+	profileController := controllers.InitCustController(profileService)
 	routes.CustRoute(server,profileController)
 }
 
@@ -57,6 +56,13 @@ func initLoan(mongoClient *mongo.Client){
 	routes.LoanRoute(server,lController)
 }
 
+func initTrans(mongoClient *mongo.Client){
+	ctx = context.TODO()
+	tService := service.InitTransaction(mongoClient, ctx)
+	tController := controllers.InitTransactionController(tService)
+	routes.TransRoute(server,tController)
+}
+
 func main(){
 	server = gin.Default()
 	mongoclient,err :=config.ConnectDataBase()
@@ -69,6 +75,7 @@ func main(){
 	initAcc(mongoclient)
 	initBank(mongoclient)
 	initLoan(mongoclient)
+	initTrans(mongoclient)
 	fmt.Println("server running on port",constants.Port)
 	log.Fatal(server.Run(constants.Port))
 }

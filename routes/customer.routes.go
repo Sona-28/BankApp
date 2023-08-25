@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CustRoute(router *gin.Engine, controller controllers.TransactionController) {
+func CustRoute(router *gin.Engine, controller controllers.CustomerController) {
 	router.POST("/customer", controller.CreateCustomer)
 	router.GET("/customer/:id", controller.GetCustomerById)
 	router.PUT("/customer/:id", controller.UpdateCustomerById)

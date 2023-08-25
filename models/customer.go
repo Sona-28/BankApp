@@ -8,6 +8,7 @@ type Customer struct {
 	Password    string            `json:"password" bson:"password"`
 	Name        string            `json:"name" bson:"name"`
 	Account_ID  int64             `json:"account_id" bson:"account_id"`
+	Balance     int64           `json:"balance" bson:"balance"`
 	Transaction []CustTransaction `json:"transaction" bson:"transaction"`
 }
 

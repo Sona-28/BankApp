@@ -10,22 +10,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type TransactionController struct{
-     TransactionService  interfaces.Icustomer
+type CustomerController struct{
+    CustomerService  interfaces.Icustomer
 }
 
 
-func InitTransController(transactionService interfaces.Icustomer) TransactionController {
-    return TransactionController{transactionService}
+func InitCustController(customerService interfaces.Icustomer) CustomerController {
+    return CustomerController{customerService}
 }
 
-func (t *TransactionController)CreateCustomer(ctx *gin.Context){
+func (t *CustomerController)CreateCustomer(ctx *gin.Context){
     var trans *models.Customer  
     if err := ctx.ShouldBindJSON(&trans); err != nil {
         ctx.JSON(http.StatusBadRequest, err.Error())
         return
     }
-    newtrans, err := t.TransactionService.CreateCustomer(trans)
+    newtrans, err := t.CustomerService.CreateCustomer(trans)
     if(err!=nil){
         ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 
@@ -36,13 +36,13 @@ func (t *TransactionController)CreateCustomer(ctx *gin.Context){
 
 
 
-func (t *TransactionController)GetCustomerById(ctx *gin.Context){
+func (t *CustomerController)GetCustomerById(ctx *gin.Context){
     id:= ctx.Param("id")
     id1,err := strconv.ParseInt(id,10,64)
     if(err!=nil){
         ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
     }
-    val, err := t.TransactionService.GetCustomerById(id1)
+    val, err := t.CustomerService.GetCustomerById(id1)
     if(err!=nil){
         ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 
@@ -50,7 +50,7 @@ func (t *TransactionController)GetCustomerById(ctx *gin.Context){
     ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": val})
 }
 
-func (t *TransactionController)UpdateCustomerById(ctx *gin.Context){
+func (t *CustomerController)UpdateCustomerById(ctx *gin.Context){
     id:= ctx.Param("id")
     fv := &models.UpdateModel{}
     if err := ctx.ShouldBindJSON(&fv); err != nil {
@@ -62,7 +62,7 @@ func (t *TransactionController)UpdateCustomerById(ctx *gin.Context){
     if(err!=nil){
         ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
     }
-    res,err := t.TransactionService.UpdateCustomerById(id1,fv)
+    res,err := t.CustomerService.UpdateCustomerById(id1,fv)
     if err!=nil{
         fmt.Println("error")
         ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
@@ -70,40 +70,40 @@ func (t *TransactionController)UpdateCustomerById(ctx *gin.Context){
     ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": res})
 }
 
-func (t *TransactionController)DeleteCustomerById(ctx *gin.Context){
+func (t *CustomerController)DeleteCustomerById(ctx *gin.Context){
     id:= ctx.Param("id")
     id1,err := strconv.ParseInt(id,10,64)
     if(err!=nil){
         ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
     }
-    res,err := t.TransactionService.DeleteCustomerById(id1)
+    res,err := t.CustomerService.DeleteCustomerById(id1)
     if err!=nil{
         ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
     }
     ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": res})
 }
 
-func (t *TransactionController)GetAllCustomerTransaction(ctx *gin.Context){
+func (t *CustomerController)GetAllCustomerTransaction(ctx *gin.Context){
     id:= ctx.Param("id")
     id1,err := strconv.ParseInt(id,10,64)
     if(err!=nil){
         ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
     }
-    res,err := t.TransactionService.GetAllCustomerTransaction(id1)                                                                
+    res,err := t.CustomerService.GetAllCustomerTransaction(id1)                                                                
     if err!=nil{
         ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
     }
     ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": res})
 }
 
-func (t *TransactionController)GetAllTransactionSum(ctx *gin.Context){
+func (t *CustomerController)GetAllTransactionSum(ctx *gin.Context){
     id := ctx.Param("id")
     id1,_ := strconv.ParseInt(id,10,64)
     var date *Date
 	if err := ctx.ShouldBindJSON(&date); err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 	}
-    res,err := t.TransactionService.GetAllTransactionSum(id1, date.From, date.To)
+    res,err := t.CustomerService.GetAllTransactionSum(id1, date.From, date.To)
     if err!=nil{
         ctx.JSON(http.StatusBadGateway, gin.H{"status":"fail","message":err.Error()})
     }
